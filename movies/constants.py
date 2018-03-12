@@ -1,5 +1,5 @@
 VOTES_SCHEMA = {
-  "table_name": "votes,
+  "table_name": "votes",
    "options": {
        "primary_key": ["user_id", "movie_id"],
   },
