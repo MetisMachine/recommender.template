@@ -1,0 +1,15 @@
+name: recommender
+channels:
+  - maciejkula
+  - pytorch
+  - defaults              
+dependencies:
+  - pip:
+    - pytz==2017.3
+    - requests
+    - skafossdk==0.0.8
+    - pandas==0.22.0
+  - spotlight
+  - pytorch-cpu
+  - torchvision 
+  - numpy
