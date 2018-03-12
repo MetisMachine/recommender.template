@@ -31,32 +31,34 @@ def write_data(data, schema, skafos):
   """Write data out to the data engine."""
   # Save out using the data engine
   data_length = len(data)
-  log.info('Saving {} movie records with the data engine'.format(data_length))
+  log.info('Saving {} records with the data engine'.format(data_length))
   res = skafos.engine.save(schema, data).result()
   log.debug(res)
+
 
 # VOTES TABLE 
 # In order to get recommendations from the model, a votes table must be created with a schema defined in constants.py
 # Unless that table exists, build an initial votes table with fake data.. 
-x=uuid.uuid4()
-
 def make_fake_votes(num_movies, num_users):
   users = [uuid.uuid4() for u in range(0, num_users)]
   movies = np.array(range(0, num_movies))
   fake_votes = []
   for u in users:
     for m in np.random.choice(movies, size=num_movies // 2):
-      fake_votes.append({'user_id': str(u), 'movie_id': str(m), 'vote': randint(1,2), 'vote_time':datetime.now()})
-  return fake_votes
+      time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+      fake_votes.append({'user_id': str(u), 'movie_id': str(m), 'vote': randint(1,2), 'vote_time': time})
+    print("Writing %s votes to cassandra.." % len(fake_votes), flush=True)
+    write_data(fake_votes, VOTES_SCHEMA, ska)
+    fake_votes.clear()
 
-sample_votes_data = make_fake_votes(num_movies=20, num_users=8)
+# Generate fake votes, create table, and write to the table
+# If a "votes" table exists already, comment the next line out
+make_fake_votes(num_movies=20, num_users=8)
 
 
-
-# Use Skafos Data Engine to Pull in Votes and Movies data
+# Use Skafos Data Engine to Pull in Votes data
 log.info('Setting up view and querying movie list')
-res = ska.engine.create_view("ratings", {"keyspace": KEYSPACE, "table": "votes"},
-                             DataSourceType.Cassandra).result()
+res = ska.engine.create_view("ratings", {"table": "votes"}, DataSourceType.Cassandra).result()
 ratings_query = "SELECT * FROM ratings"
 ratings = ska.engine.query(ratings_query).result()['data']
 log.info("Ingested {} movie ratings".format(len(ratings)))
@@ -97,9 +99,10 @@ for device, user_row in user_ind.iterrows():
   # Get list of all movies this user voted on
   user = user_row.user_int
   user_votes = ratings_df[ratings_df.user_int == user].movie_int.unique()
-  # Calculate diff
+  # Calculate difference in the two lists - rate those movies only
   m = np.setdiff1d(full_movies, user_votes)
   user_rank = 0
+  # for each movie and prediction for a given user, create a recommendation row
   for movie, pred in zip(m, model.predict(user_ids=user, item_ids=m)):
     batch_count += 1
     user_rank += 1
@@ -116,6 +119,6 @@ for device, user_row in user_ind.iterrows():
       recommendations.clear()
   # clean up anything remaining in a partial batch
   if recommendations:
-    log.info('writing out a final partial batch')  
+    log.info('writing out a final partial batch') 
     write_data(recommendations, RECOMMEND_SCHEMA, ska)
 
