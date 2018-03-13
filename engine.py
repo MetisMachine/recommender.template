@@ -16,6 +16,9 @@ else:
   BATCH_SIZE = 10
   
 KEYSPACE = None
+rec_schema = RECOMMEND_SCHEMA
+if KEYSPACE:
+  rec_schema["namespace"] = KEYSPACE
 
 ## VOTES TABLE SETUP
 # In order to get recommendations from the model, a votes table must be created with a schema defined in constants.py
@@ -95,12 +98,12 @@ for device, user_row in user_ind.iterrows():
                             'pred_rating': float(pred),
                             'pred_time': timestamp})
     if batch_count % int(BATCH_SIZE) == 0:
-      write_data(recommendations, RECOMMEND_SCHEMA, ska)
+      write_data(recommendations, rec_schema, ska)
       # Clear the recommendation set
       recommendations.clear()
   # clean up anything remaining in a partial batch
   if recommendations:
     log.info('...writing out a final partial batch')
-    write_data(recommendations, RECOMMEND_SCHEMA, ska)
+    write_data(recommendations, rec_schema, ska)
 
 log.info('Done.')
