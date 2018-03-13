@@ -9,7 +9,12 @@ from skafossdk import *
 ## Setup the logger and initialize Skafos
 log = get_logger('recommender')
 ska = Skafos()
-BATCH_SIZE = os.environ['BATCH_SIZE']
+
+if 'BATCH_SIZE' in os.environ:
+  BATCH_SIZE = os.environ['BATCH_SIZE']
+else:
+  BATCH_SIZE = 10
+  
 KEYSPACE = None
 
 ## VOTES TABLE SETUP
