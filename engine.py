@@ -35,8 +35,7 @@ if KEYSPACE:
 else:
   res = ska.engine.create_view("ratings", {"table": "votes"}, DataSourceType.Cassandra).result()
 
-ratings_query = "SELECT * FROM ratings"
-ratings = ska.engine.query(ratings_query).result()['data']
+ratings = ska.engine.query("SELECT * FROM ratings").result()['data']
 log.info("Ingested {} movie ratings".format(len(ratings)))
 
 ## Make a data frame of user ratings and print head
