@@ -31,6 +31,7 @@ These are the environment variables that could be set from the terminal in the p
 **optional**
 
 - BATCH_SIZE, default=10: Number of rows written to the database at a time.
+- KEYSPACE, default=None: Namespace in cassandra if the user has a set of tables to use that are pre-built.
 
 ## Deployment
 Once the user is ready to fire it off (after following the dependency steps above):
