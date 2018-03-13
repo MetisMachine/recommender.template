@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from random import randint
 from datetime import datetime
+from constants import VOTES_SCHEMA
 
 def make_indicies(col_type, unique_list):
   """Given a list of unique things, create and map an ascending index."""
