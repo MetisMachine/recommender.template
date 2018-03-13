@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from random import randint
 from datetime import datetime
-from constants import VOTES_SCHEMA
+from movies.constants import VOTES_SCHEMA
 
 def make_indicies(col_type, unique_list):
   """Given a list of unique things, create and map an ascending index."""
@@ -19,13 +19,12 @@ def make_indicies(col_type, unique_list):
 
 def write_data(data, schema, skafos):
   """Write data out to the data engine."""
-  # Save out using the data engine
-  log.info('Saving {} records with the data engine'.format(len(data)))
+  print('Saving {} records with the data engine'.format(len(data)), flush=True)
   res = skafos.engine.save(schema, data).result()
-  log.debug(res)
+  print(res, flush=True)
 
 
-def make_fake_votes(num_movies, num_users):
+def make_fake_votes(num_movies, num_users, skafos):
   """Generate fake votes as a starter set for recommendations."""
   users = [uuid.uuid4() for u in range(0, num_users)]
   movies = np.array(range(0, num_movies), dtype=np.int)
@@ -36,5 +35,5 @@ def make_fake_votes(num_movies, num_users):
       time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
       fake_votes.append({'user_id': str(u), 'movie_id': str(m), 'vote': randint(1, 2), 'vote_time': time})
     print("Writing %s votes to cassandra.." % len(fake_votes), flush=True)
-    write_data(fake_votes, VOTES_SCHEMA, ska)
+    write_data(fake_votes, VOTES_SCHEMA, skafos)
     fake_votes.clear()
