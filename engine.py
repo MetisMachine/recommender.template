@@ -22,7 +22,7 @@ KEYSPACE = None
 # Unless that table exists, we will build an initial votes table with fake movie data..
 # If a "votes" table exists already, the user can comment the next two lines out and set the variable KEYSPACE above
 log.info("Generating fake votes data")
-make_fake_votes(num_movies=12, num_users=3)
+make_fake_votes(num_movies=12, num_users=3, skafos=ska)
 
 # Tweak the functions in movies/helpers.py and the schema in movies/constants.py if you have data that are not movies
 # This same model could be used for any type of product recommendation given user_ids, item_ids, and ratings (binary OR score)
