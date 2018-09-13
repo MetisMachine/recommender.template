@@ -7,7 +7,7 @@ dependencies:
   - pip:
     - pytz==2017.3
     - requests
-    - skafossdk==0.0.8
+    - skafossdk==1.1.7
     - pandas==0.22.0
   - spotlight
   - pytorch-cpu
